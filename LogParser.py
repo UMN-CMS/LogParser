@@ -26,6 +26,8 @@ class LogLine:
     """ Base LogLine class.
 
         Members:
+            ll_type: The type of logfile the LogLine was created from. "PM" or
+                "APM".
             datetime: A python datetime object representing the time when the
                 log line was written.
             mac_address: A string of the MAC address of the PM/APM.
@@ -50,6 +52,7 @@ class LogLine:
         """
         # Set up the datetime format string
         self.format_str = "%a %b %d %H:%M:%S %Y"
+        self.ll_type = None
 
         split_text = self.get_split_text(text_line)
         # Set up common variables
@@ -97,6 +100,8 @@ class APMLogLine(LogLine):
     """ A class to access one line of data in an APM log file.
 
         Inherited Members:
+            ll_type: The type of logfile the LogLine was created from. "PM" or
+                "APM".
             datetime: A python datetime object representing the time when the
                 log line was written.
             mac_address: A string of the MAC address of the PM/APM.
@@ -131,6 +136,7 @@ class APMLogLine(LogLine):
         """
         LogLine.__init__(self, text_line)
         split_text = self.get_split_text(text_line)
+        self.ll_type = "APM"
         # Output
         self.aux_output_voltage_a = float(split_text[10].strip(" V"))
         self.aux_output_voltage_b = float(split_text[11].strip(" V"))
@@ -142,6 +148,8 @@ class PMLogLine(LogLine):
     """ A class to access one line of data in a PM log file.
 
         Inherited Members:
+            ll_type: The type of logfile the LogLine was created from. "PM" or
+                "APM".
             datetime: A python datetime object representing the time when the
                 log line was written.
             mac_address: A string of the MAC address of the PM/APM.
@@ -170,6 +178,7 @@ class PMLogLine(LogLine):
         """
         LogLine.__init__(self, text_line)
         split_text = self.get_split_text(text_line)
+        self.ll_type = "PM"
         # Input power values
         self.secondary_input_current = float(split_text[10].strip(" A"))
         self.secondary_input_voltage = float(split_text[11].strip(" V"))
