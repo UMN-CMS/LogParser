@@ -72,8 +72,8 @@ class LogLine:
         # Load
         self.load = bool(int(split_text[7]))
         # Input power values
-        self.input_voltage = float(split_text[8].strip(" A"))
-        self.input_current = float(split_text[9].strip(" V"))
+        self.input_current = float(split_text[8].strip(" A"))
+        self.input_voltage = float(split_text[9].strip(" V"))
         # Total Power
         self.total_power = float(split_text[-1].strip(" W"))
 
