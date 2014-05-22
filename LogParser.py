@@ -225,9 +225,31 @@ class LogFile:
 
 
 if __name__ == '__main__':
+    # Allows command line options to be parsed.
+    from optparse import OptionParser  # Command line parsing
+
+    usage = "usage: %prog -i input_file -o output_file"
+    parser = OptionParser(usage=usage, version="")
+    parser.add_option(
+            "-i",
+            "--input-file",
+            action="store",
+            type="string",
+            dest="input_file",
+            help="input log file"
+            )
+    parser.add_option(
+            "-o",
+            "--output-file",
+            action="store",
+            type="string",
+            dest="output_file",
+            help="output root file"
+            )
+
+    (options, args) = parser.parse_args()
+
     # Read in the first argument as a log file
-    from sys import argv
-    inputfile = argv[1]
-    lf = LogFile(inputfile)
+    lf = LogFile(options.input_file)
     for line in lf:
         print line.input_voltage
