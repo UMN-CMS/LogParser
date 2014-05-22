@@ -20,6 +20,7 @@
 #  https://github.com/UMN-CMS/LogParser
 
 from datetime import datetime
+import ROOT
 
 
 class LogLine:
@@ -258,7 +259,79 @@ if __name__ == '__main__':
 
     (options, args) = parser.parse_args()
 
+    # Make our output file
+    output_tfile = ROOT.TFile(options.output_file, "RECREATE")
+    output_tfile.cd()
+
+    # Make the arrays to us in our TTree. Arrays are required because TTrees
+    # need to work with a memory address.
+    # See: http://wlav.web.cern.ch/wlav/pyroot/tpytree.html
+    from array import array
+    DOUBLE = "d"  # double
+    BOOL = "b"  # signed char
+    temperature_array = array(DOUBLE, [-1])
+    voltage_out_array = array(DOUBLE, [-1])
+    power_good_array = array(BOOL, [False])
+    margin_up_array = array(BOOL, [False])
+    margin_down_array = array(BOOL, [False])
+    load_array = array(BOOL, [False])
+    input_voltage_array = array(DOUBLE, [-1])
+    input_current_array = array(DOUBLE, [-1])
+    total_power_array = array(DOUBLE, [-1])
+    aux_output_voltage_a_array = array(DOUBLE, [-1])
+    aux_output_voltage_b_array = array(DOUBLE, [-1])
+    aux_output_voltage_c_array = array(DOUBLE, [-1])
+    aux_output_voltage_d_array = array(DOUBLE, [-1])
+    secondary_input_current_array = array(DOUBLE, [-1])
+    secondary_input_voltage_array = array(DOUBLE, [-1])
+
+    # Make the TTree
+    ttree = ROOT.TTree("outtree", "Output Tree")
+    ttree.Branch("temperature", temperature_array, "temperature/D")
+    ttree.Branch("voltage_out", voltage_out_array, "voltage_out/D")
+    ttree.Branch("power_good_array", power_good_array, "power_good_array/O")
+    ttree.Branch("margin_up_array", margin_up_array, "margin_up_array/O")
+    ttree.Branch("margin_down_array", margin_down_array, "margin_down_array/O")
+    ttree.Branch("load_array", load_array, "load_array/O")
+    ttree.Branch("input_voltage_array", input_voltage_array, "input_voltage_array/D")
+    ttree.Branch("input_current_array", input_current_array, "input_current_array/D")
+    ttree.Branch("total_power_array", total_power_array, "total_power_array/D")
+    ttree.Branch("aux_output_voltage_a_array", aux_output_voltage_a_array, "aux_output_voltage_a_array/D")
+    ttree.Branch("aux_output_voltage_b_array", aux_output_voltage_b_array, "aux_output_voltage_b_array/D")
+    ttree.Branch("aux_output_voltage_c_array", aux_output_voltage_c_array, "aux_output_voltage_c_array/D")
+    ttree.Branch("aux_output_voltage_d_array", aux_output_voltage_d_array, "aux_output_voltage_d_array/D")
+    ttree.Branch("secondary_input_current_array", secondary_input_current_array, "secondary_input_current_array/D")
+    ttree.Branch("secondary_input_voltage_array", secondary_input_voltage_array, "secondary_input_voltage_array/D")
+
     # Read in the first argument as a log file
     lf = LogFile(options.input_file)
     for line in lf:
-        print line.input_voltage
+        temperature_array[0] = line.temperature
+        voltage_out_array[0] = line.voltage_out
+        power_good_array[0] = line.power_good
+        margin_up_array[0] = line.margin_up
+        margin_down_array[0] = line.margin_down
+        load_array[0] = line.load
+        input_voltage_array[0] = line.input_voltage
+        input_current_array[0] = line.input_current
+        total_power_array[0] = line.total_power
+        if line.ll_type == "APM":
+            aux_output_voltage_a_array[0] = line.aux_output_voltage_a
+            aux_output_voltage_b_array[0] = line.aux_output_voltage_b
+            aux_output_voltage_c_array[0] = line.aux_output_voltage_c
+            aux_output_voltage_d_array[0] = line.aux_output_voltage_d
+            secondary_input_current_array[0] = -1
+            secondary_input_voltage_array[0] = -1
+        elif line.ll_type == "PM":
+            aux_output_voltage_a_array[0] = -1
+            aux_output_voltage_b_array[0] = -1
+            aux_output_voltage_c_array[0] = -1
+            aux_output_voltage_d_array[0] = -1
+            secondary_input_current_array[0] = line.secondary_input_current
+            secondary_input_voltage_array[0] = line.secondary_input_voltage
+        # Fill the TTree
+        ttree.Fill()
+
+    # Close our TFile
+    output_tfile.Write()
+    output_tfile.Close()
