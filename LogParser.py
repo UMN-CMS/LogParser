@@ -39,7 +39,8 @@ class LogLine:
                 mode.
             margin_down: A bool indicating if the test was running in "margin
                 down" mode.
-            load: A bool indicating if the test was running in "load" mode.
+            load: An int indicating what mode the test was running in; 1 is
+                normal load, 2 is high load.
             input_voltage: A float of the primary input voltage.
             input_current: A float of the primary input current.
             total_power: A float of the total power in Watts.
@@ -71,7 +72,7 @@ class LogLine:
         self.margin_up = bool(int(split_text[5]))
         self.margin_down = bool(int(split_text[6]))
         # Load
-        self.load = bool(int(split_text[7]))
+        self.load = int(split_text[7])
         # Input power values
         self.input_current = float(split_text[8].strip(" A"))
         self.input_voltage = float(split_text[9].strip(" V"))
@@ -113,7 +114,8 @@ class APMLogLine(LogLine):
                 mode.
             margin_down: A bool indicating if the test was running in "margin
                 down" mode.
-            load: A bool indicating if the test was running in "load" mode.
+            load: An int indicating what mode the test was running in; 1 is
+                normal load, 2 is high load.
             input_voltage: A float of the primary input voltage.
             input_current: A float of the primary input current.
             total_power: A float of the total power in Watts.
@@ -161,7 +163,8 @@ class PMLogLine(LogLine):
                 mode.
             margin_down: A bool indicating if the test was running in "margin
                 down" mode.
-            load: A bool indicating if the test was running in "load" mode.
+            load: An int indicating what mode the test was running in; 1 is
+                normal load, 2 is high load.
             input_voltage: A float of the primary input voltage.
             input_current: A float of the primary input current.
             total_power: A float of the total power in Watts.
@@ -269,12 +272,13 @@ if __name__ == '__main__':
     from array import array
     DOUBLE = "d"  # double
     BOOL = "b"  # signed char
+    INT = "i"  # signed int
     temperature_array = array(DOUBLE, [-1])
     voltage_out_array = array(DOUBLE, [-1])
     power_good_array = array(BOOL, [False])
     margin_up_array = array(BOOL, [False])
     margin_down_array = array(BOOL, [False])
-    load_array = array(BOOL, [False])
+    load_array = array(INT, [-1])
     input_voltage_array = array(DOUBLE, [-1])
     input_current_array = array(DOUBLE, [-1])
     total_power_array = array(DOUBLE, [-1])
@@ -292,7 +296,6 @@ if __name__ == '__main__':
     ttree.Branch("power_good_array", power_good_array, "power_good_array/O")
     ttree.Branch("margin_up_array", margin_up_array, "margin_up_array/O")
     ttree.Branch("margin_down_array", margin_down_array, "margin_down_array/O")
-    ttree.Branch("load_array", load_array, "load_array/O")
     ttree.Branch("input_voltage_array", input_voltage_array, "input_voltage_array/D")
     ttree.Branch("input_current_array", input_current_array, "input_current_array/D")
     ttree.Branch("total_power_array", total_power_array, "total_power_array/D")
@@ -302,6 +305,7 @@ if __name__ == '__main__':
     ttree.Branch("aux_output_voltage_d_array", aux_output_voltage_d_array, "aux_output_voltage_d_array/D")
     ttree.Branch("secondary_input_current_array", secondary_input_current_array, "secondary_input_current_array/D")
     ttree.Branch("secondary_input_voltage_array", secondary_input_voltage_array, "secondary_input_voltage_array/D")
+    ttree.Branch("load_array", load_array, "load_array/I")
 
     # Read in the first argument as a log file
     lf = LogFile(options.input_file)
