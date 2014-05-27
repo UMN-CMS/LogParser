@@ -39,8 +39,9 @@ class LogLine:
                 mode.
             margin_down: A bool indicating if the test was running in "margin
                 down" mode.
-            load: An int indicating what mode the test was running in; 1 is
-                normal load, 2 is high load.
+            high_load: A bool indicating if the test was run in "high load"
+                mode, if false then the test was run with normal load, if true it
+                was run with high load.
             input_voltage: A float of the primary input voltage.
             input_current: A float of the primary input current.
             total_power: A float of the total power in Watts.
@@ -71,8 +72,9 @@ class LogLine:
         # Margin up and down
         self.margin_up = bool(int(split_text[5]))
         self.margin_down = bool(int(split_text[6]))
-        # Load
-        self.load = int(split_text[7])
+        # High Load, we convert from 1 = load, 2 = high load to a bool, with
+        # true meaning high load was on.
+        self.high_load = bool(int(split_text[7]) - 1)
         # Input power values
         self.input_current = float(split_text[8].strip(" A"))
         self.input_voltage = float(split_text[9].strip(" V"))
@@ -114,8 +116,9 @@ class APMLogLine(LogLine):
                 mode.
             margin_down: A bool indicating if the test was running in "margin
                 down" mode.
-            load: An int indicating what mode the test was running in; 1 is
-                normal load, 2 is high load.
+            high_load: A bool indicating if the test was run in "high load"
+                mode, if false then the test was run with normal load, if true it
+                was run with high load.
             input_voltage: A float of the primary input voltage.
             input_current: A float of the primary input current.
             total_power: A float of the total power in Watts.
@@ -163,8 +166,9 @@ class PMLogLine(LogLine):
                 mode.
             margin_down: A bool indicating if the test was running in "margin
                 down" mode.
-            load: An int indicating what mode the test was running in; 1 is
-                normal load, 2 is high load.
+            high_load: A bool indicating if the test was run in "high load"
+                mode, if false then the test was run with normal load, if true it
+                was run with high load.
             input_voltage: A float of the primary input voltage.
             input_current: A float of the primary input current.
             total_power: A float of the total power in Watts.
@@ -272,13 +276,12 @@ if __name__ == '__main__':
     from array import array
     DOUBLE = "d"  # double
     BOOL = "b"  # signed char
-    INT = "i"  # signed int
     temperature_array = array(DOUBLE, [-1])
     voltage_out_array = array(DOUBLE, [-1])
     power_good_array = array(BOOL, [False])
     margin_up_array = array(BOOL, [False])
     margin_down_array = array(BOOL, [False])
-    load_array = array(INT, [-1])
+    high_load_array = array(BOOL, [False])
     input_voltage_array = array(DOUBLE, [-1])
     input_current_array = array(DOUBLE, [-1])
     total_power_array = array(DOUBLE, [-1])
@@ -296,7 +299,7 @@ if __name__ == '__main__':
     ttree.Branch("power_good", power_good_array, "power_good/O")
     ttree.Branch("margin_up", margin_up_array, "margin_up/O")
     ttree.Branch("margin_down", margin_down_array, "margin_down/O")
-    ttree.Branch("load", load_array, "load_array/I")
+    ttree.Branch("high_load", high_load_array, "high_load/O")
     ttree.Branch("input_voltage", input_voltage_array, "input_voltage/D")
     ttree.Branch("input_current", input_current_array, "input_current/D")
     ttree.Branch("total_power", total_power_array, "total_power/D")
@@ -315,7 +318,7 @@ if __name__ == '__main__':
         power_good_array[0] = line.power_good
         margin_up_array[0] = line.margin_up
         margin_down_array[0] = line.margin_down
-        load_array[0] = line.load
+        high_load_array[0] = line.high_load
         input_voltage_array[0] = line.input_voltage
         input_current_array[0] = line.input_current
         total_power_array[0] = line.total_power
