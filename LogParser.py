@@ -201,10 +201,10 @@ class LogFile:
         self.lines = []
         # Check the type of file
         pm_type = None
-        if filename.startswith("Power"):
-            pm_type = "PM"
-        elif filename.startswith("Aux"):
+        if "AuxPowerMezz" in filename:
             pm_type = "APM"
+        elif "PowerMezz" in filename:
+            pm_type = "PM"
         else:
             err_str = "Input log file starts with neither 'Power' nor 'Aux'."
             raise RuntimeError(err_str)
