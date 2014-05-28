@@ -29,8 +29,12 @@ class LogLine:
         Members:
             ll_type: The type of logfile the LogLine was created from. "PM" or
                 "APM".
-            datetime: A python datetime object representing the time when the
-                log line was written.
+            year: An int representing the year the data was taken.
+            month: An int representing the month the data was taken.
+            day: An int representing the day the data was taken.
+            hour: An int representing the hour the data was taken, from 0-23.
+            minute: An int representing the minute the data was taken, from 0-59.
+            second: An int representing the second the data was taken, from 0-59.
             mac_address: A string of the MAC address of the PM/APM.
             temperature: A float of the temperature of the PM/APM.
             voltage_out: A float of the primary output voltage.
@@ -60,7 +64,13 @@ class LogLine:
         split_text = self.get_split_text(text_line)
         # Set up common variables
         # Date
-        self.datetime = datetime.strptime(split_text[0], self.format_str)
+        dt = datetime.strptime(split_text[0], self.format_str)
+        self.year = dt.year
+        self.month = dt.month
+        self.day = dt.day
+        self.hour = dt.hour
+        self.minute = dt.minute
+        self.second = dt.second
         # MAC Address
         self.mac_address = split_text[1]
         # Temperature
@@ -106,8 +116,12 @@ class APMLogLine(LogLine):
         Inherited Members:
             ll_type: The type of logfile the LogLine was created from. "PM" or
                 "APM".
-            datetime: A python datetime object representing the time when the
-                log line was written.
+            year: An int representing the year the data was taken.
+            month: An int representing the month the data was taken.
+            day: An int representing the day the data was taken.
+            hour: An int representing the hour the data was taken, from 0-23.
+            minute: An int representing the minute the data was taken, from 0-59.
+            second: An int representing the second the data was taken, from 0-59.
             mac_address: A string of the MAC address of the PM/APM.
             temperature: A float of the temperature of the PM/APM.
             voltage_out: A float of the primary output voltage.
@@ -156,8 +170,12 @@ class PMLogLine(LogLine):
         Inherited Members:
             ll_type: The type of logfile the LogLine was created from. "PM" or
                 "APM".
-            datetime: A python datetime object representing the time when the
-                log line was written.
+            year: An int representing the year the data was taken.
+            month: An int representing the month the data was taken.
+            day: An int representing the day the data was taken.
+            hour: An int representing the hour the data was taken, from 0-23.
+            minute: An int representing the minute the data was taken, from 0-59.
+            second: An int representing the second the data was taken, from 0-59.
             mac_address: A string of the MAC address of the PM/APM.
             temperature: A float of the temperature of the PM/APM.
             voltage_out: A float of the primary output voltage.
@@ -276,6 +294,13 @@ if __name__ == '__main__':
     from array import array
     DOUBLE = "d"  # double
     BOOL = "b"  # signed char
+    INT = "i"  # signed int
+    year_array = array(INT, [-1])
+    month_array = array(INT, [-1])
+    day_array = array(INT, [-1])
+    hour_array = array(INT, [-1])
+    minute_array = array(INT, [-1])
+    second_array = array(INT, [-1])
     temperature_array = array(DOUBLE, [-1])
     voltage_out_array = array(DOUBLE, [-1])
     power_good_array = array(BOOL, [False])
@@ -294,6 +319,12 @@ if __name__ == '__main__':
 
     # Make the TTree
     ttree = ROOT.TTree("outtree", "Output Tree")
+    ttree.Branch("year", year_array, "year/I")
+    ttree.Branch("month", month_array, "month/I")
+    ttree.Branch("day", day_array, "day/I")
+    ttree.Branch("hour", hour_array, "hour/I")
+    ttree.Branch("minute", minute_array, "minute/I")
+    ttree.Branch("second", second_array, "second/I")
     ttree.Branch("temperature", temperature_array, "temperature/D")
     ttree.Branch("voltage_out", voltage_out_array, "voltage_out/D")
     ttree.Branch("power_good", power_good_array, "power_good/O")
@@ -313,6 +344,12 @@ if __name__ == '__main__':
     # Read in the first argument as a log file
     lf = LogFile(options.input_file)
     for line in lf:
+        year_array[0] = line.year
+        month_array[0] = line.month
+        day_array[0] = line.day
+        hour_array[0] = line.hour
+        minute_array[0] = line.minute
+        second_array[0] = line.second
         temperature_array[0] = line.temperature
         voltage_out_array[0] = line.voltage_out
         power_good_array[0] = line.power_good
